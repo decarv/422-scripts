@@ -1,0 +1,20 @@
+#!/bin/bash
+
+controller="IDE"
+dev=1
+
+usr=$(whoami)
+
+if=$1
+if [ -h $if ]; then echo "usage ./mkiso.sh <filename>"; exit; fi
+
+iftar="$if.tar"
+tar -cf $iftar $if
+tmpdir="/tmp/$(date | md5sum | awk '{print $1}')"
+mkdir -p $tmpdir
+mv $iftar $tmpdir
+
+medium="$if.iso"
+mkisofs -o $medium $tmpdir										           && \
+VBoxManage storageattach "minix3.1.2a-2" --storagectl $controller --port 0 --device $dev --type dvddrive --medium $medium
+rm $medium
